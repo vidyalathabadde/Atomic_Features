@@ -1,0 +1,22 @@
+{
+  "guid": "21FDB859-9510-428B-A570-6C57C41E1359",
+  "name": "Atomic",
+  "categories": ["Toolkit/oneAPI-samples/Tools/OpenACCToOpenMP"],
+  "description": "This openMP sample illustrates the read, write, update & capture clauses for the atomic directive",
+  "toolchain": [ "icpx" ],
+  "dependencies": [ "compiler|icpx","openmp" ],
+  "languages": [ { "c": { "properties": { "projectOptions": [ { "projectType": "makefile" } ] } } } ],
+  "targetDevice": [ "GPU" ],
+  "gpuRequired": ["pvc"],
+  "os": [ "linux" ],
+  "builder": [ "make" ],
+  "ciTests": {
+        "linux": [{
+                "steps": [
+                        "make",
+                        "make run"
+                 ]
+        }]
+  },
+  "expertise": "Concepts and Functionality"
+}
