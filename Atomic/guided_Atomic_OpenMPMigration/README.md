@@ -1,6 +1,6 @@
-# `BilateralFilter` Sample
+# `Atomic` Sample
  
-This sample uses OpenMP directives to perform a simple bilateral filter on an image and measures performance. The original OpenACC source code is migrated to OpenMP to Offload on Intel® Platforms.
+This sample illustrates the read, write, update & capture clauses for the atomic directive. The original OpenACC source code is migrated to OpenMP to Offload on Intel® Platforms.
 
 | Area                  | Description
 |:---                       |:---
@@ -10,8 +10,7 @@ This sample uses OpenMP directives to perform a simple bilateral filter on an im
 
 ## Purpose
 
-Bilateral filter is an edge-preserving nonlinear smoothing filter. There are three parameters distribute to the filter: gaussian delta, euclidean delta and iterations.
-When the euclidean delta increases, most of the fine texture will be filtered away, yet all contours are as crisp as in the original image. If the euclidean delta approximates to ∞, the filter becomes a normal gaussian filter. Fine texture will blur more with larger gaussian delta. Multiple iterations have the effect of flattening the colors in an image considerably, but without blurring edges, which produces a cartoon effect.
+OpenMP atomic operations allows multiple threads to safely update a shared numeric variable, such as on hardware platforms that support atomic operation use. An atomic operation applies only to the single assignment statement that immediately follows it, so atomic operations are useful for code that requires fine-grain synchronization.
 
 > **Note**: We use intel-application-migration-tool-for-openacc-to-openmp which assists developers in porting OpenACC code automatically to OpenMP code. 
 
@@ -34,12 +33,21 @@ For more information on how to install the above Tool, visit [intel-application-
 ## Key Implementation Details
 
 This sample demonstrates the migration of the following OpenACC pragmas: 
-- #pragma acc kernels copyin() copyout() create() if()
+- #pragma acc parallel loop copy() copyout()
   The kernels construct identifies a region of code that may contain parallelism that has been as been translated into:
-  - #pragma omp target map(to:) map(from:) map(alloc:) if()
-- #pragma acc loop independent, gang
-  The loop directive is intended to give the compiler additional information about the next loop in the code. This has been translated into:
-  - #pragma omp loop order(concurrent)
+  - #pragma omp target teams loop map(tofrom:) map(from:)
+- #pragma acc atomic read
+  T. This has been translated into:
+  - #pragma omp atomic read
+- #pragma acc atomic write
+  T. This has been translated into:
+  - #pragma omp atomic write
+- #pragma acc atomic update
+  T. This has been translated into:
+  - #pragma omp atomic update
+- #pragma acc atomic capture
+  T. This has been translated into:
+  - #pragma omp atomic capture
   
 
 >  **Note**: Refer to [Portability across Heterogeneous Architectures](https://www.intel.com/content/www/us/en/developer/articles/technical/openmp-accelerator-offload.html#gs.n33nuz) for general information about the migration of OpenACC to OpenMP.
@@ -48,7 +56,7 @@ This sample demonstrates the migration of the following OpenACC pragmas:
 
 When working with the command-line interface (CLI), you should configure the oneAPI toolkits using environment variables. Set up your CLI environment by sourcing the `setvars` script every time you open a new terminal window. This practice ensures that the compiler, libraries, and tools are ready for development.
 
-## Migrate the `bilateralFilter` Sample
+## Migrate the `Atomic` Sample
 
 ### Migrate the Code using intel-application-migration-tool-for-openacc-to-openmp
 
@@ -61,28 +69,17 @@ For this sample, the tool takes application sources (either C/C++ or Fortran lan
 
 The binary of the translator can be found inside intel-application-migration-tool-for-openacc-to-openmp/src location
     
-  2. The openacc sample is taken from NVIDIA_HPC_SDK samples and can be found at the installation location as shown below
+  2. The openacc sample is taken from [Openacc-samples](https://github.com/OpenACC/openacc-examples.git)
      ```
-     cd /opt/hpc_software/sdk/nvidia/hpc_sdk/Linux_x86_64/24.3/examples/OpenACC/SDK/src/bilateralFilter
+     cd openacc-examples/Submissions/C/Atomic/
      ```
   3. Now invoke the translator to migrate the openACC pragmas to OpenMP as shown below
      ```
-     intel-application-migration-tool-for-openacc-to-openmp/src/intel-application-migration-tool-for-openacc-to-openmp bilateralFilter.c
+     intel-application-migration-tool-for-openacc-to-openmp/src/intel-application-migration-tool-for-openacc-to-openmp atomic.c
      ```
 For each given input-file, the tool will generate a translation file named <input-file>.translated and will also dump a report with translation details into a file named <input-file>.report.
 
-### Optimization
-
-The tool does not aim at guaranteeing the best achievable performance but at generating a semantically equivalent translation. To optimize the code, one can use `teams` directive as it plays a crucial role, especially in the context of offloading computations to devices such as GPUs. The `teams` directive in OpenMP is used to create a league of thread teams, each of which can execute concurrently that leads to good performance.
-Introduce teams in the pragma as shown below in the translated code (line 126)
-   ```
-   #pragma omp target teams map(to:h_Src[0:imageW*imageH],h_Gaussian[0:KERNEL_LENGTH])\
-            map(from:h_Dst[0:imageW*imageH]) map(alloc:h_BufferX[0:imageW*imageH],\
-            h_BufferY[0:imageW*imageH],h_BufferZ[0:imageW*imageH],\
-            h_BufferW[0:imageW*imageH]) if(accelerate)
-   ```
-
-## Build the `bilateralFilter` Sample for GPU
+## Build the `Atomic` Sample for GPU
 
 > **Note**: If you have not already done so, set up your CLI
 > environment by sourcing  the `setvars` script in the root of your oneAPI installation.
