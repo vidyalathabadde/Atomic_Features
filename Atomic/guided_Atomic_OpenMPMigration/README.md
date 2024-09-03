@@ -51,7 +51,7 @@ This sample demonstrates the migration of the following OpenACC pragmas:
   - #pragma omp atomic update
 - #pragma acc atomic capture
 
-  The `atomic capture` updates the value of a variable while capturing the original or final value of the variable atomically.. This has been translated into:
+  The `atomic capture` updates the value of a variable while capturing the original or final value of the variable atomically. This has been translated into:
   - #pragma omp atomic capture
   
 
