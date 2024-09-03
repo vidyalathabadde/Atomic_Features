@@ -4,7 +4,7 @@ This sample illustrates the read, write, update & capture clauses for the atomic
 
 | Area                  | Description
 |:---                       |:---
-| What you will learn       | Migrating and optimizing bilateralFilter from OpenACC to OpenMP
+| What you will learn       | Migrating and optimizing Atomic from OpenACC to OpenMP
 | Time to complete          | 15 minutes
 | Category                  | Concepts and Functionality
 
@@ -34,19 +34,24 @@ For more information on how to install the above Tool, visit [intel-application-
 
 This sample demonstrates the migration of the following OpenACC pragmas: 
 - #pragma acc parallel loop copy() copyout()
+
   The kernels construct identifies a region of code that may contain parallelism that has been as been translated into:
   - #pragma omp target teams loop map(tofrom:) map(from:)
 - #pragma acc atomic read
-  T. This has been translated into:
+
+  The `atomic read` reads the value of a variable atomically. The value of a shared variable can be read safely, avoiding the danger of reading an intermediate value of the variable when it is accessed simultaneously by a concurrent thread. This has been translated into:
   - #pragma omp atomic read
 - #pragma acc atomic write
-  T. This has been translated into:
+
+  The `atomic write` writes the value of a variable atomically. The value of a shared variable can be written exclusively to avoid errors from simultaneous writes. This has been translated into:
   - #pragma omp atomic write
 - #pragma acc atomic update
-  T. This has been translated into:
+
+  The `atomic update` updates the value of a variable atomically. Allows only one thread to write to a shared variable at a time, avoiding errors from simultaneous writes to the same variable. This has been translated into:
   - #pragma omp atomic update
 - #pragma acc atomic capture
-  T. This has been translated into:
+
+  The `atomic capture` updates the value of a variable while capturing the original or final value of the variable atomically.. This has been translated into:
   - #pragma omp atomic capture
   
 
